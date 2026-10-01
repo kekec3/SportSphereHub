@@ -1,0 +1,102 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Treninzi</h1>
+        <p class="text-muted">Pronađi trenera i zakaži individualni trening.</p>
+      </div>
+    </div>
+
+    <!-- filters -->
+    <div class="card filter-card">
+      <div class="form-grid-3">
+        <div class="form-field">
+          <label>Objekat</label>
+          <select [(ngModel)]="filterObject">
+            <option value="">Svi objekti</option>
+            @for (o of objects(); track o._id) {
+              <option [value]="o._id">{{ o.name }} · {{ o.city }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Sport</label>
+          <select [(ngModel)]="filterSport">
+            <option value="">Svi sportovi</option>
+            @for (s of sports(); track s._id) {
+              <option [value]="s._id">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field filter-btns">
+          <label>&nbsp;</label>
+          <div class="filter-actions">
+            <button class="btn btn-primary btn-sm" (click)="loadCoaches()">Filtriraj</button>
+            <button class="btn btn-ghost btn-sm" (click)="resetFilters()">Poništi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="text-muted">Učitavanje…</p>
+    } @else if (loadError()) {
+      <div class="alert alert-error">{{ loadError() }}</div>
+    } @else if (coaches().length === 0) {
+      <div class="card">
+        <p class="text-muted">Nema trenera po zadatim kriterijumima.</p>
+      </div>
+    } @else {
+      <div class="coach-grid">
+        @for (c of coaches(); track c._id) {
+          <div class="card coach-card">
+            <div class="coach-head">
+              <div>
+                <h3 class="coach-name">{{ c.name }}</h3>
+                <span class="chip sport-chip">{{ c.sport?.name }}</span>
+              </div>
+              <div class="coach-rating" title="Prosečna ocena">
+                ⭐ {{ c.avgRating || 0 }}
+              </div>
+            </div>
+
+            <p class="coach-meta">🏟️ {{ c.objectId?.name }} · {{ c.objectId?.city }}</p>
+            <p class="coach-meta">🎯 {{ c.specialization }}</p>
+            <p class="coach-price">{{ c.pricePerHour }} RSD / sat</p>
+
+            <button class="btn btn-primary btn-sm" (click)="openBooking(c)">
+              {{ selectedCoachId() === c._id ? 'Zatvori' : 'Zakaži trening' }}
+            </button>
+
+            @if (selectedCoachId() === c._id) {
+              <div class="booking-form">
+                <div class="form-field">
+                  <label>Datum</label>
+                  <input type="date" [(ngModel)]="bookDate" />
+                </div>
+                <div class="grid-2">
+                  <div class="form-field">
+                    <label>Početak</label>
+                    <input type="time" [(ngModel)]="bookStart" step="3600" />
+                  </div>
+                  <div class="form-field">
+                    <label>Kraj</label>
+                    <input type="time" [(ngModel)]="bookEnd" step="3600" />
+                  </div>
+                </div>
+                @if (formError()) {
+                  <p class="form-error">{{ formError() }}</p>
+                }
+                <button class="btn btn-primary btn-sm" (click)="book(c)">Potvrdi</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (formSuccess()) {
+        <div class="alert alert-success">{{ formSuccess() }}</div>
+      }
+    }
+  </div>
+</section>

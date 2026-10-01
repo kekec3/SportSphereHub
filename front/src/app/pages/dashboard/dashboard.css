@@ -1,0 +1,13 @@
+.card {
+  max-width: 640px;
+}
+
+.demo-block {
+  margin-top: var(--space-6);
+}
+.demo-block h2 {
+  margin-bottom: 0.2em;
+}
+.demo-block > p {
+  margin-bottom: var(--space-4);
+}

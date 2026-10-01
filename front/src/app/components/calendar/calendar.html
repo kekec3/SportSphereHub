@@ -1,0 +1,62 @@
+<div class="calendar">
+  <div class="cal-toolbar">
+    <button type="button" class="btn btn-ghost btn-sm" (click)="prevWeek()">‹ Prethodna</button>
+    <span class="cal-week">{{ weekLabel() }}</span>
+    <button type="button" class="btn btn-ghost btn-sm" (click)="nextWeek()">Sledeća ›</button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+  @if (message()) {
+    <div class="alert alert-success">{{ message() }}</div>
+  }
+
+  <div class="cal-scroll">
+    <table class="cal-table">
+      <thead>
+        <tr>
+          <th class="cal-hour-col">Sat</th>
+          @for (d of days(); track d.getTime()) {
+            <th>
+              <div class="cal-day">{{ dayLabel(d) }}</div>
+              <div class="cal-date">{{ d.getDate() }}.{{ d.getMonth() + 1 }}.</div>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (h of hours(); track h) {
+          <tr>
+            <td class="cal-hour-col">{{ h }}:00</td>
+            @for (d of days(); track d.getTime()) {
+              <td
+                class="cal-cell"
+                [class.booked]="isBooked(d, h)"
+                [class.selected]="isSelected(d, h)"
+                [class.past]="isPast(d, h)"
+                (mousedown)="onCellDown(d, h, $event)"
+                (mouseenter)="onCellEnter(d, h)"
+              ></td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cal-legend">
+    <span><i class="dot free"></i> Slobodno</span>
+    <span><i class="dot booked"></i> Zauzeto</span>
+    <span><i class="dot selected"></i> Izabrano</span>
+  </div>
+
+  @if (selectedStart() != null) {
+    <div class="cal-reserve">
+      <span
+        >Izabran termin: <strong>{{ selectedLabel() }}</strong></span
+      >
+      <button type="button" class="btn btn-primary btn-sm" (click)="reserve()">Rezerviši</button>
+    </div>
+  }
+</div>

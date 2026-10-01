@@ -1,0 +1,183 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Oprema i porudžbine</h1>
+        <p class="text-muted">Upravljaj opremom i obradi porudžbine za svoje objekte.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab" [class.active]="tab() === 'catalog'" (click)="setTab('catalog')">
+        Oprema
+      </button>
+      <button type="button" class="tab" [class.active]="tab() === 'orders'" (click)="setTab('orders')">
+        Porudžbine
+      </button>
+    </div>
+
+    @if (tab() === 'catalog') {
+      <div class="toolbar">
+        <div class="filter-bar">
+          <select [(ngModel)]="filterObject" (change)="reload()">
+            <option value="">Svi objekti</option>
+            @for (o of objects(); track o._id) {
+              <option [value]="o._id">{{ o.name }}</option>
+            }
+          </select>
+        </div>
+        @if (!showForm()) {
+          <button type="button" class="btn btn-primary" (click)="startCreate()">+ Nova oprema</button>
+        }
+      </div>
+
+      @if (showForm()) {
+        <form class="card" (ngSubmit)="submitForm()">
+          <h2>{{ editingId() ? 'Izmena opreme' : 'Nova oprema' }}</h2>
+          @if (formError()) {
+            <div class="alert alert-error">{{ formError() }}</div>
+          }
+          <div class="grid-2">
+            <div class="form-field">
+              <label>Naziv</label>
+              <input [(ngModel)]="form.name" name="name" />
+            </div>
+            <div class="form-field">
+              <label>Objekat</label>
+              <select [(ngModel)]="form.objectId" name="objectId">
+                <option value="">— izaberi —</option>
+                @for (o of objects(); track o._id) {
+                  <option [value]="o._id">{{ o.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-field">
+              <label>Sport</label>
+              <select [(ngModel)]="form.sport" name="sport">
+                <option value="">— izaberi —</option>
+                @for (s of sports(); track s._id) {
+                  <option [value]="s._id">{{ s.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field"></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-field">
+              <label>Cena (RSD)</label>
+              <input type="number" [(ngModel)]="form.price" name="price" />
+            </div>
+            <div class="form-field">
+              <label>Zalihe</label>
+              <input type="number" [(ngModel)]="form.stock" name="stock" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Slika (opciono)</label>
+            @if (form.image) {
+              <div class="img-preview">
+                <img [src]="form.image" alt="slika" />
+                <button type="button" class="btn btn-ghost btn-sm" (click)="clearImage()">Ukloni</button>
+              </div>
+            }
+            <app-file-upload label="Izaberi sliku" accept="image/*" [preview]="false" (fileSelected)="onImage($event)" />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ editingId() ? 'Sačuvaj' : 'Dodaj' }}</button>
+            <button type="button" class="btn btn-ghost" (click)="cancelForm()">Otkaži</button>
+          </div>
+        </form>
+      }
+
+      @if (listMsg()) {
+        <div class="alert alert-success">{{ listMsg() }}</div>
+      }
+
+      @if (loading()) {
+        <div class="card"><p class="text-muted">Učitavanje…</p></div>
+      } @else if (equipment().length === 0) {
+        <div class="card"><p class="text-muted">Nema opreme.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Naziv</th>
+                <th>Objekat</th>
+                <th>Sport</th>
+                <th>Cena</th>
+                <th>Zalihe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of equipment(); track e._id) {
+                <tr>
+                  <td>
+                    @if (e.image) {
+                      <img class="thumb" [src]="e.image" alt="" />
+                    }
+                  </td>
+                  <td>{{ e.name }}</td>
+                  <td>{{ e.objectId?.name }}</td>
+                  <td>{{ e.sport?.name }}</td>
+                  <td>{{ e.price }} RSD</td>
+                  <td>{{ e.stock }}</td>
+                  <td class="row-actions">
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="startEdit(e)">Izmeni</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="remove(e)">Obriši</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'orders') {
+      @if (orderMsg()) {
+        <div class="alert alert-success">{{ orderMsg() }}</div>
+      }
+      @if (loading()) {
+        <div class="card"><p class="text-muted">Učitavanje…</p></div>
+      } @else if (orders().length === 0) {
+        <div class="card"><p class="text-muted">Nema porudžbina.</p></div>
+      } @else {
+        <div class="orders-list">
+          @for (o of orders(); track o._id) {
+            <div class="card order-card">
+              <div class="order-head">
+                <div>
+                  <strong>{{ o.userName }}</strong>
+                  <span class="text-muted"> · {{ o.createdAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+                </div>
+                <span class="badge" [ngClass]="orderStatusClass(o.status)">{{ orderStatusLabel(o.status) }}</span>
+              </div>
+              <ul class="order-items">
+                @for (it of o.items; track $index) {
+                  <li>
+                    {{ it.name }} × {{ it.quantity }} — {{ it.priceAtOrder * it.quantity }} RSD
+                    <span class="text-muted">({{ it.objectName }})</span>
+                  </li>
+                }
+              </ul>
+              <div class="order-foot">
+                <span class="order-total">Ukupno (moji artikli): {{ o.myTotal }} RSD</span>
+                @if (o.actionable) {
+                  <div class="row-actions">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="pickup(o)">Preuzeto</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="decline(o)">Otkaži</button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

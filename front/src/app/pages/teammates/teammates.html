@@ -1,0 +1,193 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Saigrači</h1>
+        <p class="text-muted">Pronađi ekipu ili objavi svoj oglas za saigrače.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [ngClass]="{ active: tab() === 'browse' }"
+        (click)="setTab('browse')"
+      >
+        Oglasi
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [ngClass]="{ active: tab() === 'mine' }"
+        (click)="setTab('mine')"
+      >
+        Moji oglasi
+      </button>
+    </div>
+
+    <!-- ===================== BROWSE ===================== -->
+    @if (tab() === 'browse') {
+      <div class="card filter-card">
+        <div class="form-grid-3">
+          <div class="form-field">
+            <label>Sport</label>
+            <select [(ngModel)]="filterSport">
+              <option value="">Svi sportovi</option>
+              @for (s of sports(); track s._id) {
+                <option [value]="s._id">{{ s.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Grad</label>
+            <input type="text" [(ngModel)]="filterCity" placeholder="npr. Novi Sad" />
+          </div>
+          <div class="form-field">
+            <label>Datum</label>
+            <input type="date" [(ngModel)]="filterDate" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="btn btn-primary btn-sm" (click)="loadAds()">Filtriraj</button>
+          <button class="btn btn-ghost btn-sm" (click)="resetFilters()">Poništi</button>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <p class="text-muted">Učitavanje…</p>
+      } @else if (ads().length === 0) {
+        <div class="card">
+          <p class="text-muted">Trenutno nema aktivnih oglasa po zadatim kriterijumima.</p>
+        </div>
+      } @else {
+        <div class="ad-grid">
+          @for (a of ads(); track a._id) {
+            <div class="card ad-card">
+              <div class="ad-top">
+                <span class="chip sport-chip">{{ a.sport?.name }}</span>
+                <span class="ad-missing">nedostaje {{ a.missingPlayers }}</span>
+              </div>
+              <h3 class="ad-author">{{ a.sportista?.firstName }} {{ a.sportista?.lastName }}</h3>
+              <p class="ad-meta">📍 {{ a.city }}</p>
+              <p class="ad-meta">🗓️ {{ a.date | date: 'dd.MM.yyyy.' }} u {{ a.time }}</p>
+
+              @if (a.mine) {
+                <span class="chip type-chip">Vaš oglas</span>
+              } @else if (a.requestStatus === 'approved') {
+                <span class="chip status-active">✓ Prihvaćeni ste</span>
+              } @else if (a.requestStatus === 'rejected') {
+                <span class="chip status-closed">Zahtev odbijen</span>
+              } @else if (a.requestStatus === 'pending') {
+                <button class="btn btn-ghost btn-sm" disabled>Zahtev na čekanju</button>
+              } @else {
+                <button class="btn btn-primary btn-sm" (click)="join(a)">Pridruži se</button>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- ===================== MINE ===================== -->
+    @if (tab() === 'mine') {
+      <div class="card">
+        <h2>Objavi novi oglas</h2>
+        <div class="form-grid-3">
+          <div class="form-field">
+            <label>Sport</label>
+            <select [(ngModel)]="newSport">
+              <option value="">— izaberi —</option>
+              @for (s of sports(); track s._id) {
+                <option [value]="s._id">{{ s.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Grad</label>
+            <input type="text" [(ngModel)]="newCity" placeholder="npr. Novi Sad" />
+          </div>
+          <div class="form-field">
+            <label>Datum</label>
+            <input type="date" [(ngModel)]="newDate" />
+          </div>
+          <div class="form-field">
+            <label>Vreme</label>
+            <input type="time" [(ngModel)]="newTime" step="3600" />
+          </div>
+          <div class="form-field">
+            <label>Broj saigrača koji nedostaju</label>
+            <input type="number" [(ngModel)]="newMissing" min="1" />
+          </div>
+        </div>
+        @if (formError()) {
+          <p class="form-error">{{ formError() }}</p>
+        }
+        <div class="filter-actions">
+          <button class="btn btn-primary btn-sm" (click)="createAd()">Objavi oglas</button>
+        </div>
+      </div>
+
+      @if (myAds().length === 0) {
+        <div class="card">
+          <p class="text-muted">Još niste objavili nijedan oglas.</p>
+        </div>
+      } @else {
+        @for (a of myAds(); track a._id) {
+          <div class="card my-ad-card">
+            <div class="my-ad-head">
+              <div>
+                <span class="chip sport-chip">{{ a.sport?.name }}</span>
+                <strong class="my-ad-title"
+                  >{{ a.city }} · {{ a.date | date: 'dd.MM.yyyy.' }} u {{ a.time }}</strong
+                >
+              </div>
+              <div class="my-ad-status">
+                <span
+                  class="chip"
+                  [ngClass]="a.status === 'active' ? 'status-active' : 'status-closed'"
+                >
+                  {{ a.status === 'active' ? 'Aktivan' : 'Zatvoren' }}
+                </span>
+                <span class="text-muted">nedostaje {{ a.missingPlayers }}</span>
+                @if (a.status === 'active') {
+                  <button class="btn btn-ghost btn-sm" (click)="close(a)">Zatvori oglas</button>
+                }
+              </div>
+            </div>
+
+            <div class="requests">
+              <h4>Zahtevi za pridruživanje</h4>
+              @if (a.requests?.length === 0) {
+                <p class="text-muted">Nema zahteva.</p>
+              } @else {
+                @for (r of a.requests; track r._id) {
+                  <div class="request-row">
+                    <span>{{ r.requester?.firstName }} {{ r.requester?.lastName }}</span>
+                    @if (r.status === 'pending') {
+                      <span class="req-actions">
+                        <button class="btn btn-primary btn-sm" (click)="respond(a, r, 'approved')">
+                          Prihvati
+                        </button>
+                        <button class="btn btn-ghost btn-sm" (click)="respond(a, r, 'rejected')">
+                          Odbij
+                        </button>
+                      </span>
+                    } @else {
+                      <span
+                        class="chip"
+                        [ngClass]="r.status === 'approved' ? 'status-active' : 'status-closed'"
+                      >
+                        {{ r.status === 'approved' ? 'Prihvaćen' : 'Odbijen' }}
+                      </span>
+                    }
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+  </div>
+</section>

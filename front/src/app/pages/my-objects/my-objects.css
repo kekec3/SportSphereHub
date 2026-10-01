@@ -1,0 +1,152 @@
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6em 1em;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--color-primary-dark);
+  border-bottom-color: var(--color-primary);
+}
+
+.obj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.obj-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.obj-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.obj-card-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.obj-meta {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.obj-sports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 var(--space-2);
+}
+.sport-chip {
+  background: #eef3ff;
+  border-color: #cdd9f5;
+  color: #2b4a8b;
+}
+.type-chip {
+  background: var(--surface-2);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.obj-elements {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 0.9rem;
+}
+.obj-elements li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.obj-card .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.badge-approved {
+  background: #e8f6ef;
+  color: var(--success);
+}
+
+.badge-pending {
+  background: #fff2d9;
+  color: var(--color-accent-dark);
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-4);
+}
+
+.card h2:not(:first-of-type) {
+  margin-top: var(--space-5);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: var(--space-4);
+}
+
+.res-builder {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.form-actions {
+  margin-top: var(--space-5);
+}
+
+.example {
+  margin-top: var(--space-4);
+}
+
+.example summary {
+  cursor: pointer;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.example pre {
+  background: var(--surface-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-size: 0.82rem;
+  margin-top: var(--space-3);
+}
+
+.import-ok {
+  color: var(--success);
+  font-weight: 600;
+  margin: var(--space-3) 0;
+}

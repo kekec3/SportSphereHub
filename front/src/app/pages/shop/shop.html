@@ -1,0 +1,180 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Prodavnica opreme</h1>
+        <p class="text-muted">Poruči sportsku opremu i preuzmi je u objektu.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [ngClass]="{ active: tab() === 'catalog' }"
+        (click)="setTab('catalog')"
+      >
+        Katalog
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [ngClass]="{ active: tab() === 'orders' }"
+        (click)="setTab('orders')"
+      >
+        Moje porudžbine
+      </button>
+    </div>
+
+    <!-- ===================== CATALOG ===================== -->
+    @if (tab() === 'catalog') {
+      <div class="shop-layout">
+        <div class="shop-main">
+          <div class="card filter-card">
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label>Sport</label>
+                <select [(ngModel)]="filterSport">
+                  <option value="">Svi sportovi</option>
+                  @for (s of sports(); track s._id) {
+                    <option [value]="s._id">{{ s.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Objekat</label>
+                <select [(ngModel)]="filterObject">
+                  <option value="">Svi objekti</option>
+                  @for (o of objects(); track o._id) {
+                    <option [value]="o._id">{{ o.name }} · {{ o.city }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-primary btn-sm" (click)="loadEquipment()">Filtriraj</button>
+              <button class="btn btn-ghost btn-sm" (click)="resetFilters()">Poništi</button>
+            </div>
+          </div>
+
+          @if (loading()) {
+            <p class="text-muted">Učitavanje…</p>
+          } @else if (equipment().length === 0) {
+            <div class="card"><p class="text-muted">Nema opreme po zadatim kriterijumima.</p></div>
+          } @else {
+            <div class="eq-grid">
+              @for (e of equipment(); track e._id) {
+                <div class="card eq-card">
+                  <div class="eq-img">
+                    @if (e.image) {
+                      <img [src]="e.image" [alt]="e.name" />
+                    } @else {
+                      <div class="eq-img-empty">🛍️</div>
+                    }
+                  </div>
+                  <h3 class="eq-name">{{ e.name }}</h3>
+                  <span class="chip sport-chip">{{ e.sport?.name }}</span>
+                  <p class="eq-meta text-muted">{{ e.objectId?.name }} · {{ e.objectId?.city }}</p>
+                  <p class="eq-price">{{ e.price }} RSD</p>
+                  <p class="eq-stock" [class.out]="e.stock === 0">
+                    {{ e.stock > 0 ? 'Na stanju: ' + e.stock : 'Nema na stanju' }}
+                  </p>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    [disabled]="e.stock === 0"
+                    (click)="addToCart(e)"
+                  >
+                    Dodaj u korpu
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- cart -->
+        <aside class="shop-cart card">
+          <h2>Korpa</h2>
+          @if (cart().length === 0) {
+            <p class="text-muted">Korpa je prazna.</p>
+          } @else {
+            @for (item of cart(); track item.equipment._id) {
+              <div class="cart-row">
+                <div class="cart-info">
+                  <strong>{{ item.equipment.name }}</strong>
+                  <span class="text-muted">{{ item.equipment.price }} RSD</span>
+                </div>
+                <div class="cart-qty">
+                  <button class="qty-btn" (click)="decQty(item)">−</button>
+                  <span>{{ item.quantity }}</span>
+                  <button class="qty-btn" (click)="incQty(item)">+</button>
+                  <button class="remove-btn" (click)="removeFromCart(item)" title="Ukloni">🗑️</button>
+                </div>
+              </div>
+            }
+            <div class="cart-total">
+              <span>Ukupno</span>
+              <strong>{{ cartTotal() }} RSD</strong>
+            </div>
+            @if (orderError()) {
+              <p class="form-error">{{ orderError() }}</p>
+            }
+            <button class="btn btn-primary" (click)="placeOrder()">Poruči</button>
+          }
+          @if (orderSuccess()) {
+            <p class="avatar-ok">✓ {{ orderSuccess() }}</p>
+          }
+        </aside>
+      </div>
+    }
+
+    <!-- ===================== ORDERS ===================== -->
+    @if (tab() === 'orders') {
+      @if (orders().length === 0) {
+        <div class="card"><p class="text-muted">Nemate porudžbina.</p></div>
+      } @else {
+        @for (o of orders(); track o._id) {
+          <div class="card order-card">
+            <div class="order-head">
+              <div>
+                <strong>#{{ o._id.slice(-6) }}</strong>
+                <span class="text-muted"> · {{ o.createdAt | date: 'dd.MM.yyyy. HH:mm' }}</span>
+              </div>
+              <div class="order-head-right">
+                <span class="status-chip" [class]="'status-chip order-' + o.status">
+                  {{ orderStatusLabel(o.status) }}
+                </span>
+                @if (o.cancellable) {
+                  <button class="btn btn-danger btn-sm" (click)="cancelOrder(o)">Otkaži</button>
+                }
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Artikal</th>
+                    <th>Sport</th>
+                    <th>Kom.</th>
+                    <th>Cena</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (i of o.items; track $index) {
+                    <tr>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.sport }}</td>
+                      <td>{{ i.quantity }}</td>
+                      <td>{{ i.priceAtOrder * i.quantity }} RSD</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="order-total">Ukupno: <strong>{{ o.total }} RSD</strong></div>
+          </div>
+        }
+      }
+    }
+  </div>
+</section>

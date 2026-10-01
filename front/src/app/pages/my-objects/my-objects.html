@@ -1,0 +1,239 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Moji objekti</h1>
+        <p class="text-muted">Kreiraj i upravljaj svojim sportskim objektima.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab" [class.active]="view() === 'list'" (click)="setView('list')">
+        Lista
+      </button>
+      <button type="button" class="tab" [class.active]="view() === 'create'" (click)="setView('create')">
+        Novi objekat
+      </button>
+      <button type="button" class="tab" [class.active]="view() === 'import'" (click)="setView('import')">
+        Uvoz iz JSON
+      </button>
+    </div>
+
+    @if (view() === 'list') {
+      @if (loading()) {
+        <div class="card"><p class="text-muted">Učitavanje…</p></div>
+      } @else if (objects().length === 0) {
+        <div class="card">
+          <p class="text-muted">Još nemaš objekata. Kreiraj prvi preko „Novi objekat".</p>
+        </div>
+      } @else {
+        <div class="obj-grid">
+          @for (o of objects(); track o._id) {
+            <div class="card obj-card">
+              <div class="obj-card-head">
+                <h3>{{ o.name }}</h3>
+                <span
+                  class="badge"
+                  [class.badge-approved]="o.status === 'approved'"
+                  [class.badge-pending]="o.status === 'pending'"
+                  >{{ statusLabel(o.status) }}</span
+                >
+              </div>
+              <p class="text-muted">{{ o.city }} · {{ o.address }}</p>
+              <p class="obj-meta">{{ o.pricePerHour }} RSD/h · {{ o.terrainCount }} teren(a)</p>
+
+              <div class="obj-sports">
+                @for (s of o.sports; track s) {
+                  <span class="chip sport-chip">{{ s }}</span>
+                } @empty {
+                  <span class="text-muted">Bez sportova</span>
+                }
+              </div>
+
+              <ul class="obj-elements">
+                @for (el of o.elements; track el.name) {
+                  <li>
+                    <span class="chip type-chip">{{ typeLabel(el.type) }}</span>
+                    {{ el.name }} <span class="text-muted">· {{ el.capacity }} mesta</span>
+                  </li>
+                } @empty {
+                  <li class="text-muted">Nema unetih terena.</li>
+                }
+              </ul>
+
+              <a class="btn btn-primary btn-sm" [routerLink]="['/zaposleni/objekat', o._id]">Upravljaj</a>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    @if (view() === 'create') {
+      <form class="card" (ngSubmit)="submitCreate()">
+        <h2>Podaci o objektu</h2>
+        @if (createError()) {
+          <div class="alert alert-error">{{ createError() }}</div>
+        }
+        @if (createSuccess()) {
+          <div class="alert alert-success">{{ createSuccess() }}</div>
+        }
+
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Naziv</label>
+            <input [(ngModel)]="form.name" name="name" />
+          </div>
+          <div class="form-field">
+            <label>Grad</label>
+            <input [(ngModel)]="form.city" name="city" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Adresa</label>
+          <input [(ngModel)]="form.address" name="address" />
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Geo. širina (lat)</label>
+            <input type="number" step="any" [(ngModel)]="form.lat" name="lat" />
+          </div>
+          <div class="form-field">
+            <label>Geo. dužina (lng)</label>
+            <input type="number" step="any" [(ngModel)]="form.lng" name="lng" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Cena po satu (RSD)</label>
+            <input type="number" [(ngModel)]="form.pricePerHour" name="price" />
+          </div>
+          <div class="form-field">
+            <label>Maks. nedolazaka</label>
+            <input type="number" [(ngModel)]="form.maxNoShows" name="mns" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Otvaranje</label>
+            <input type="time" [(ngModel)]="form.open" name="open" />
+          </div>
+          <div class="form-field">
+            <label>Zatvaranje</label>
+            <input type="time" [(ngModel)]="form.close" name="close" />
+          </div>
+        </div>
+
+        <h2>Tereni</h2>
+        <p class="form-hint">Objekat mora imati bar jedan otvoren teren kapaciteta ≥ 4.</p>
+
+        @if (resources().length) {
+          <div class="table-wrap">
+            <table class="table res-table">
+              <thead>
+                <tr>
+                  <th>Naziv</th>
+                  <th>Tip</th>
+                  <th>Kapacitet</th>
+                  <th>Sportovi</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of resources(); track $index) {
+                  <tr>
+                    <td>{{ r.name }}</td>
+                    <td>{{ typeLabel(r.type) }}</td>
+                    <td>{{ r.capacity }}</td>
+                    <td>{{ sportNames(r.sports) }}</td>
+                    <td>
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="removeResource($index)">
+                        Ukloni
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <div class="res-builder">
+          <div class="grid-2">
+            <div class="form-field">
+              <label>Naziv terena</label>
+              <input [(ngModel)]="draft.name" name="dname" />
+            </div>
+            <div class="form-field">
+              <label>Tip</label>
+              <select [(ngModel)]="draft.type" name="dtype">
+                <option value="open">Otvoren</option>
+                <option value="closed">Zatvoren</option>
+                <option value="hall">Hala</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Kapacitet</label>
+            <input type="number" [(ngModel)]="draft.capacity" name="dcap" />
+          </div>
+          <div class="form-field">
+            <label>Sportovi</label>
+            <div class="chip-list">
+              @for (s of sports(); track s._id) {
+                <button
+                  type="button"
+                  class="chip"
+                  [class.active]="draftSports().includes(s._id)"
+                  (click)="toggleDraftSport(s._id)"
+                >
+                  {{ s.name }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Opis opreme (opciono, ≤300)</label>
+            <textarea [(ngModel)]="draft.equipmentDescription" name="ddesc" maxlength="300" rows="2"></textarea>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="addResource()">+ Dodaj teren</button>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Kreiraj objekat</button>
+        </div>
+      </form>
+    }
+
+    @if (view() === 'import') {
+      <div class="card">
+        <h2>Uvoz objekta iz JSON fajla</h2>
+        @if (importError()) {
+          <div class="alert alert-error">{{ importError() }}</div>
+        }
+        @if (importSuccess()) {
+          <div class="alert alert-success">{{ importSuccess() }}</div>
+        }
+        <p class="text-muted">
+          Fajl mora imati isti oblik kao forma, uključujući <code>resources</code> sa ID-jevima sportova.
+        </p>
+        <app-file-upload
+          label="Izaberi .json fajl"
+          accept="application/json,.json"
+          mode="text"
+          [preview]="false"
+          (fileSelected)="onJson($event)"
+        />
+
+        @if (parsed()) {
+          <p class="import-ok">✔ Fajl je učitan i spreman za uvoz.</p>
+          <button type="button" class="btn btn-primary" (click)="submitImport()">Uvezi objekat</button>
+        }
+
+        <details class="example">
+          <summary>Primer JSON strukture</summary>
+          <pre>{{ exampleJson() }}</pre>
+        </details>
+      </div>
+    }
+  </div>
+</section>

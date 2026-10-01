@@ -1,0 +1,22 @@
+<svg
+  class="chart"
+  [attr.viewBox]="'0 0 ' + width + ' ' + height"
+  preserveAspectRatio="xMidYMid meet"
+  role="img"
+>
+  @for (g of gridLines(); track g.y) {
+    <line class="grid" [attr.x1]="padL" [attr.y1]="g.y" [attr.x2]="g.x2" [attr.y2]="g.y" />
+    <text class="axis" [attr.x]="padL - 8" [attr.y]="g.y + 4" text-anchor="end">{{ g.value }}</text>
+  }
+
+  @if (points().length > 1) {
+    <path class="area" [attr.d]="area()" [attr.fill]="color()" />
+    <polyline class="line" [attr.points]="line()" [attr.stroke]="color()" />
+  }
+
+  @for (p of points(); track p.label) {
+    <circle class="dot" [attr.cx]="p.px" [attr.cy]="p.py" r="4" [attr.fill]="color()" />
+    <text class="value" [attr.x]="p.px" [attr.y]="p.py - 10" text-anchor="middle">{{ p.value }}</text>
+    <text class="label" [attr.x]="p.px" [attr.y]="p.labelY" text-anchor="middle">{{ p.label }}</text>
+  }
+</svg>

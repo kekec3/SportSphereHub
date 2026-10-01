@@ -1,0 +1,44 @@
+SportSphere Hub — korišćene biblioteke (nisu u arhivi; instaliraju se sa `npm install`)
+=========================================================================================
+
+Node.js (runtime):            https://nodejs.org/          (v20+ preporučeno)
+MongoDB Community Server:     https://www.mongodb.com/try/download/community
+MongoDB Database Tools        https://www.mongodb.com/try/download/database-tools
+  (mongodump / mongorestore)
+Angular CLI (globalno):       https://www.npmjs.com/package/@angular/cli   (npm i -g @angular/cli)
+
+--- BACKEND (Express + Node, back/package.json) ---------------------------------------
+dependencies:
+  express        ^5.2.1     https://www.npmjs.com/package/express
+  mongoose       ^9.8.0     https://www.npmjs.com/package/mongoose
+  mongodb        ^7.5.0     https://www.npmjs.com/package/mongodb
+  bcryptjs       ^3.0.3     https://www.npmjs.com/package/bcryptjs
+  jsonwebtoken   ^9.0.3     https://www.npmjs.com/package/jsonwebtoken
+  multer         ^2.2.0     https://www.npmjs.com/package/multer
+  pdfkit         ^0.19.1    https://www.npmjs.com/package/pdfkit
+  cors           ^2.8.6     https://www.npmjs.com/package/cors
+devDependencies:
+  typescript     ^7.0.2     https://www.npmjs.com/package/typescript
+  tsx            ^4.23.1    https://www.npmjs.com/package/tsx          (koristi se za seed.ts)
+  nodemon        ^3.1.14    https://www.npmjs.com/package/nodemon
+  @types/*                  tipovi za express, node, jsonwebtoken, multer, pdfkit, cors
+
+--- FRONTEND (Angular 20, front/package.json) -----------------------------------------
+dependencies:
+  @angular/core, common, compiler, forms, platform-browser, router  ^20.3.0
+                            https://angular.dev
+  @angular/cdk   ^20.2.14   https://material.angular.io/cdk          (drag-and-drop kalendar)
+  leaflet        ^1.9.4     https://leafletjs.com/                   (mapa na detaljima objekta)
+  @types/leaflet ^1.9.21
+  rxjs           ~7.8.0     https://rxjs.dev
+  zone.js        ~0.15.0
+  tslib          ^2.3.0
+devDependencies:
+  @angular/cli, @angular/build, @angular/compiler-cli  ^20.3.x
+  typescript     ~5.9.2
+  (jasmine/karma — samo za testove, nisu neophodni za pokretanje)
+
+Napomena: chart.js je naveden u zavisnostima ali se NE koristi — dijagrami statistike su
+ručno napisane SVG komponente (components/bar-chart, components/line-chart).
+Avatari se generišu preko DiceBear HTTP API-ja (https://www.dicebear.com) u toku registracije.
+Mape koriste OpenStreetMap pločice (https://tile.openstreetmap.org).

@@ -1,0 +1,70 @@
+<section class="page">
+  <div class="container">
+    <h1>Pretraga objekata</h1>
+    <p class="text-muted">Filtriraj sportske objekte po nazivu, gradu, sportu i tipu terena.</p>
+
+    <div class="card search-card">
+      <div class="search-grid">
+        <div class="form-field">
+          <label>Naziv</label>
+          <input type="text" [(ngModel)]="name" placeholder="npr. Voždovac" />
+        </div>
+
+        <div class="form-field">
+          <label>Grad</label>
+          <select multiple [(ngModel)]="cityList" [size]="4" class="multi-select">
+            @for (c of cities(); track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          <p class="form-hint text-muted">Drži Ctrl za izbor više gradova.</p>
+        </div>
+
+        <div class="form-field">
+          <label>Sport</label>
+          <select [(ngModel)]="sport">
+            <option value="">Svi sportovi</option>
+            @for (s of sports(); track s._id) {
+              <option [value]="s._id">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Tip terena</label>
+          <select [(ngModel)]="terrainType">
+            <option value="">Svi tipovi</option>
+            <option value="open">Otvoreni</option>
+            <option value="closed">Zatvoreni</option>
+            <option value="hall">Hala</option>
+          </select>
+        </div>
+      </div>
+
+      @if (auth.isLoggedIn()) {
+        <label class="free-today">
+          <input type="checkbox" [(ngModel)]="onlyFreeToday" (ngModelChange)="runSearch()" />
+          Prikaži samo objekte sa slobodnim terminom danas
+        </label>
+      }
+
+      <div class="search-actions">
+        <button class="btn btn-primary" (click)="runSearch()">Pretraži</button>
+        <button class="btn btn-ghost" (click)="reset()">Poništi</button>
+      </div>
+    </div>
+
+    @if (searched()) {
+      <div class="results-head">
+        <h2>Rezultati ({{ results().length }})</h2>
+        <span class="text-muted">Sortiraj klikom na zaglavlje kolone.</span>
+      </div>
+      <app-sortable-table
+        [columns]="columns"
+        [rows]="results()"
+        [actionLabel]="'Detalji'"
+        (action)="openDetails($event)"
+      />
+    }
+  </div>
+</section>

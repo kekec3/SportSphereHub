@@ -1,0 +1,75 @@
+.details-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.details-head h1 {
+  margin: 0 0 var(--space-2);
+}
+
+.badge-approved {
+  background: #e8f6ef;
+  color: var(--success);
+}
+
+.badge-pending {
+  background: #fff2d9;
+  color: var(--color-accent-dark);
+}
+
+.card {
+  margin-bottom: var(--space-5);
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-4);
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin: 0 0 var(--space-3);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.res-builder {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.row-actions {
+  display: flex;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.form-actions {
+  margin-top: var(--space-4);
+}
+
+.chip-xs {
+  font-size: 0.78rem;
+  padding: 0.25em 0.6em;
+}
+
+.cap-input {
+  max-width: 90px;
+}
+
+.desc-cell {
+  max-width: 220px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.edit-row td {
+  vertical-align: top;
+}

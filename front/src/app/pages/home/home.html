@@ -1,0 +1,77 @@
+<section class="hero page">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="badge">Sportski objekti na jednom mestu</span>
+      <h1>Pronađi teren, rezerviši termin, igraj.</h1>
+      <p class="text-muted">
+        Pretraži sportske objekte po gradu i sportu, pogledaj slobodne termine i rezerviši u par
+        klikova.
+      </p>
+      <div class="hero-cta">
+        <a routerLink="/search" class="btn btn-primary">Pretraži objekte</a>
+        @if (!auth.isLoggedIn()) {
+          <a routerLink="/register" class="btn btn-ghost">Napravi nalog</a>
+        }
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">{{ activeCount() }}</span>
+        <span class="hero-stat-label">aktivnih objekata dostupno za rezervaciju</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">🏟️</div>
+  </div>
+</section>
+
+<!-- top objects by likes -->
+<section class="container home-section">
+  <div class="section-head">
+    <h2>Najbolje ocenjeni objekti</h2>
+    <a routerLink="/search" class="section-link">Svi objekti →</a>
+  </div>
+
+  @if (topObjects().length) {
+    <div class="cards-grid">
+      @for (o of topObjects(); track o._id) {
+        <a class="card object-card" [routerLink]="['/objects', o._id]">
+          <div class="object-thumb">
+            @if (o.photos?.length) {
+              <img [src]="o.photos[0]" [alt]="o.name" />
+            } @else {
+              <span aria-hidden="true">🏟️</span>
+            }
+          </div>
+          <h3>{{ o.name }}</h3>
+          <p class="text-muted city-line">📍 {{ o.city }}</p>
+          <div class="object-meta">
+            <span class="like-pill like">👍 {{ o.likeCount }}</span>
+            <span class="price-tag">{{ o.pricePerHour }} RSD/h</span>
+          </div>
+        </a>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">Trenutno nema objekata za prikaz.</p>
+  }
+</section>
+
+<!-- active promotions -->
+<section class="container home-section">
+  <div class="section-head">
+    <h2>Aktuelne promocije</h2>
+  </div>
+
+  @if (promotions().length) {
+    <div class="cards-grid">
+      @for (p of promotions(); track p._id) {
+        <a class="card promo-card" [routerLink]="['/objects', p.objectId?._id]">
+          <span class="badge">{{ discountLabel(p) }}</span>
+          <h3>{{ p.name }}</h3>
+          <p class="text-muted">{{ p.sport?.name }} · {{ p.objectId?.name }}</p>
+          <p class="promo-valid text-muted">Važi {{ p.validFrom | date: 'dd.MM.yyyy.' }} – {{ p.validTo | date: 'dd.MM.yyyy.' }}</p>
+        </a>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">Trenutno nema aktivnih promocija.</p>
+  }
+</section>

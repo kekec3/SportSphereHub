@@ -1,0 +1,35 @@
+.table-scroll {
+  overflow-x: auto;
+}
+
+.sortable-table {
+  width: 100%;
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sortable-th:hover {
+  color: var(--color-primary-dark);
+}
+
+.sort-ind {
+  font-size: 0.7rem;
+  margin-left: 0.35em;
+  color: var(--color-primary);
+}
+
+.empty-cell {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-5);
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+.clickable-row:hover {
+  background: var(--color-primary-soft);
+}

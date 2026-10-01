@@ -1,0 +1,45 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a routerLink="/" class="brand"> <span class="brand-mark">◆</span> SportSphere Hub </a>
+
+    <nav class="main-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Početna</a
+      >
+      <a routerLink="/search" routerLinkActive="active">Pretraga</a>
+
+      @if (auth.isLoggedIn()) {
+        @if (auth.role() === 'sportista') {
+          <a routerLink="/profile" routerLinkActive="active">Moj nalog</a>
+          <a routerLink="/teammates" routerLinkActive="active">Saigrači</a>
+          <a routerLink="/trainings" routerLinkActive="active">Treninzi</a>
+          <a routerLink="/shop" routerLinkActive="active">Prodavnica</a>
+          <a routerLink="/statistics" routerLinkActive="active">Statistika</a>
+        }
+        @if (auth.role() === 'zaposleni') {
+          <a routerLink="/zaposleni" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+            >Moji objekti</a
+          >
+          <a routerLink="/zaposleni/rezervacije" routerLinkActive="active">Rezervacije</a>
+          <a routerLink="/zaposleni/promocije" routerLinkActive="active">Promocije</a>
+          <a routerLink="/zaposleni/oprema" routerLinkActive="active">Oprema</a>
+          <a routerLink="/zaposleni/kalendar" routerLinkActive="active">Kalendar</a>
+          <a routerLink="/zaposleni/izvestaji" routerLinkActive="active">Izveštaji</a>
+        }
+        @if (auth.role() === 'admin') {
+          <a routerLink="/admin" routerLinkActive="active">Administracija</a>
+        }
+      }
+    </nav>
+
+    <div class="header-actions">
+      @if (auth.isLoggedIn()) {
+        <span class="greeting">Zdravo, {{ auth.currentUser()?.firstName }}</span>
+        <button class="btn btn-ghost btn-sm" (click)="logout()">Odjava</button>
+      } @else {
+        <a routerLink="/login" class="btn btn-ghost btn-sm">Prijava</a>
+        <a routerLink="/register" class="btn btn-primary btn-sm">Registracija</a>
+      }
+    </div>
+  </div>
+</header>

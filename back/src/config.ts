@@ -1,0 +1,10 @@
+export const PORT = Number(process.env.PORT) || 4000
+export const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/sportsphere_hub"
+export const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey"
+export const JWT_EXPIRES = 60 * 60 * 2
+export const SALT_ROUNDS = 10
+export const RESET_TTL_MIN = 30
+export const DEFAULT_AVATAR = "/uploads/avatars/default.png"
+export const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:4200"
+export const REPORT_FONT = process.env.REPORT_FONT || "C:/Windows/Fonts/arial.ttf"
+export const REPORT_FONT_BOLD = process.env.REPORT_FONT_BOLD || "C:/Windows/Fonts/arialbd.ttf"

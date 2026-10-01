@@ -1,0 +1,12 @@
+.vscode
+.vscode/*
+pa220300
+DEFENSE_CHEATSHEET.md
+workspace.code-workspace
+back/dist
+back/node_modules
+back/uploads/*
+front/.andular
+front/.vscode
+front/.vscode/*
+front/public/*

@@ -1,0 +1,283 @@
+<section class="page">
+  <div class="container">
+    <h1>Moj nalog</h1>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="alert alert-success">{{ success() }}</div>
+    }
+
+    <form (ngSubmit)="save()">
+      <div class="profile-grid">
+        <!-- personal data -->
+        <div class="card">
+          <h2>Lični podaci</h2>
+
+          <div class="form-field">
+            <label>Korisničko ime</label>
+            <input type="text" [value]="username" disabled />
+            <p class="form-hint text-muted">Korisničko ime se ne može menjati.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-field">
+              <label for="firstName">Ime</label>
+              <input id="firstName" name="firstName" type="text" [(ngModel)]="firstName" />
+            </div>
+            <div class="form-field">
+              <label for="lastName">Prezime</label>
+              <input id="lastName" name="lastName" type="text" [(ngModel)]="lastName" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" [(ngModel)]="email" />
+            </div>
+            <div class="form-field">
+              <label for="phone">Telefon</label>
+              <input id="phone" name="phone" type="tel" [(ngModel)]="phone" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Omiljeni sportovi <span class="text-muted">(do 5)</span></label>
+            <div class="chip-list">
+              @for (s of sports(); track s._id) {
+                <button
+                  type="button"
+                  class="chip"
+                  [class.active]="isSelected(s._id)"
+                  (click)="toggleSport(s._id)"
+                >
+                  {{ s.name }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- avatar -->
+        <div class="card avatar-card">
+          <h2>Avatar</h2>
+          <div class="avatar-preview">
+            @if (avatar()) {
+              <img [src]="avatar()" alt="avatar" />
+            } @else {
+              <img [src]="apiUrl + currentAvatarUrl()" alt="avatar" />
+            }
+          </div>
+
+          <div class="avatar-mode">
+            <button
+              type="button"
+              class="chip"
+              [class.active]="avatarMode() === 'keep'"
+              (click)="avatarMode.set('keep')"
+            >
+              Zadrži
+            </button>
+            <button
+              type="button"
+              class="chip"
+              [class.active]="avatarMode() === 'generate'"
+              (click)="avatarMode.set('generate')"
+            >
+              Generiši
+            </button>
+            <button
+              type="button"
+              class="chip"
+              [class.active]="avatarMode() === 'upload'"
+              (click)="avatarMode.set('upload')"
+            >
+              Otpremi
+            </button>
+          </div>
+
+          @if (avatarMode() === 'generate') {
+            <app-avatar-generator (avatarSelected)="onAvatar($event)" />
+          } @else if (avatarMode() === 'upload') {
+            <app-file-upload label="Izaberi sliku" (fileSelected)="onAvatar($event)" />
+          }
+
+          @if (avatar()) {
+            <p class="avatar-ok">✓ Novi avatar izabran.</p>
+          }
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        {{ loading() ? 'Čuvanje…' : 'Sačuvaj izmene' }}
+      </button>
+    </form>
+
+    <!-- reservations -->
+    <div class="card reservations-card">
+      <h2>Moje rezervacije</h2>
+      <div class="table-scroll">
+        <table class="table sortable-table">
+          <thead>
+            <tr>
+              <th class="sortable-th" (click)="sortBy('objectName')">
+                Objekat <span class="sort-ind">{{ indicator('objectName') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('objectCity')">
+                Grad <span class="sort-ind">{{ indicator('objectCity') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('resourceName')">
+                Teren/hala <span class="sort-ind">{{ indicator('resourceName') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('sportNames')">
+                Sport <span class="sort-ind">{{ indicator('sportNames') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('date')">
+                Datum <span class="sort-ind">{{ indicator('date') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('startTime')">
+                Vreme <span class="sort-ind">{{ indicator('startTime') }}</span>
+              </th>
+              <th class="sortable-th" (click)="sortBy('status')">
+                Status <span class="sort-ind">{{ indicator('status') }}</span>
+              </th>
+              <th>Akcija</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of sortedReservations(); track r._id) {
+              <tr>
+                <td>{{ r.objectName }}</td>
+                <td>{{ r.objectCity }}</td>
+                <td>
+                  {{ r.resourceName }}
+                  <span class="chip type-chip">{{ typeLabel(r.resourceType) }}</span>
+                </td>
+                <td>{{ r.sportNames || '—' }}</td>
+                <td>{{ r.date | date: 'dd.MM.yyyy.' }}</td>
+                <td>{{ r.startTime }}–{{ r.endTime }}</td>
+                <td>
+                  <span class="status-chip" [class]="'status-chip status-' + r.status">
+                    {{ statusLabel(r.status) }}
+                  </span>
+                </td>
+                <td>
+                  @if (r.cancellable) {
+                    <button class="btn btn-danger btn-sm" (click)="cancelReservation(r)">Otkaži</button>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (sortedReservations().length === 0) {
+              <tr>
+                <td class="empty-cell" colspan="8">Nemate rezervacija.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- trainings archive -->
+    <div class="card reservations-card">
+      <h2>Moji treninzi</h2>
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Trener</th>
+              <th>Sport</th>
+              <th>Objekat</th>
+              <th>Datum</th>
+              <th>Vreme</th>
+              <th>Status</th>
+              <th>Akcija</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of trainings(); track t._id) {
+              <tr [class.past-row]="!t.upcoming">
+                <td>{{ t.coachName }}</td>
+                <td>{{ t.sportName }}</td>
+                <td>{{ t.objectName }} <span class="text-muted">· {{ t.objectCity }}</span></td>
+                <td>{{ t.date | date: 'dd.MM.yyyy.' }}</td>
+                <td>{{ t.startTime }}–{{ t.endTime }}</td>
+                <td>
+                  <span class="status-chip" [class]="'status-chip status-' + t.status">
+                    {{ trainingStatusLabel(t.status) }}
+                  </span>
+                </td>
+                <td>
+                  @if (t.cancellable) {
+                    <button class="btn btn-danger btn-sm" (click)="cancelTraining(t)">Otkaži</button>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (trainings().length === 0) {
+              <tr>
+                <td class="empty-cell" colspan="7">Nemate zakazanih treninga.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- orders / purchase history -->
+    <div class="card reservations-card">
+      <h2>Moje porudžbine</h2>
+      @if (orders().length === 0) {
+        <p class="text-muted">Nemate porudžbina.</p>
+      } @else {
+        @for (o of orders(); track o._id) {
+          <div class="order-block">
+            <div class="order-head">
+              <div>
+                <strong>#{{ o._id.slice(-6) }}</strong>
+                <span class="text-muted"> · {{ o.createdAt | date: 'dd.MM.yyyy. HH:mm' }}</span>
+              </div>
+              <div class="order-head-right">
+                <span class="status-chip" [class]="'status-chip order-' + o.status">
+                  {{ orderStatusLabel(o.status) }}
+                </span>
+                @if (o.cancellable) {
+                  <button class="btn btn-danger btn-sm" (click)="cancelOrder(o)">Otkaži</button>
+                }
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Artikal</th>
+                    <th>Sport</th>
+                    <th>Kom.</th>
+                    <th>Cena</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (i of o.items; track $index) {
+                    <tr>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.sport }}</td>
+                      <td>{{ i.quantity }}</td>
+                      <td>{{ i.priceAtOrder * i.quantity }} RSD</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="order-total">Ukupno: <strong>{{ o.total }} RSD</strong></div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</section>

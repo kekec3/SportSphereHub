@@ -1,0 +1,287 @@
+/* ============================================================
+   SportSphere Hub — global design system
+   Warm / bright palette · design tokens + shared component styles
+   ============================================================ */
+
+:root {
+  /* color */
+  --color-primary: #f2683c;        /* warm coral-orange */
+  --color-primary-dark: #d8542c;
+  --color-primary-soft: #ffe8de;
+  --color-accent: #f6a609;         /* amber */
+  --color-accent-dark: #d98b00;
+
+  --bg: #fff8f0;                   /* cream */
+  --surface: #ffffff;
+  --surface-2: #fdf1e7;
+  --text: #2f2a26;                 /* charcoal */
+  --text-muted: #857b72;
+  --border: #efe2d6;
+
+  --danger: #d64545;
+  --success: #2f9e6f;
+
+  /* shape */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+
+  --shadow-sm: 0 1px 3px rgba(64, 40, 20, 0.08);
+  --shadow: 0 6px 20px rgba(64, 40, 20, 0.10);
+  --shadow-lg: 0 14px 40px rgba(64, 40, 20, 0.16);
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  /* type + layout */
+  --font: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --maxw: 1120px;
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(1100px 480px at 82% -12%, var(--color-primary-soft), transparent 60%),
+    var(--bg);
+  min-height: 100vh;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: clamp(1.7rem, 3.2vw, 2.5rem); }
+h2 { font-size: clamp(1.35rem, 2.4vw, 1.9rem); }
+
+p { margin: 0 0 1em; }
+
+a {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+/* ---------- layout helpers ---------- */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.page { padding: var(--space-6) 0; }
+
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6em 1.15em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: transform 0.05s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover { background: var(--color-primary-dark); text-decoration: none; color: #fff; }
+
+.btn-accent { background: var(--color-accent); color: #3a2c00; }
+.btn-accent:hover { background: var(--color-accent-dark); text-decoration: none; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--surface-2); text-decoration: none; }
+
+.btn-danger { background: var(--danger); color: #fff; }
+
+.btn-block { width: 100%; }
+.btn-sm { padding: 0.4em 0.8em; font-size: 0.88rem; }
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+}
+
+/* ---------- forms ---------- */
+.form-field { margin-bottom: var(--space-4); }
+.form-field label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.35em;
+}
+
+.input,
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+input[type='tel'],
+input[type='date'],
+input[type='time'],
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  padding: 0.6em 0.8em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.form-error { color: var(--danger); font-size: 0.88rem; margin-top: 0.3em; }
+
+/* ---------- alerts ---------- */
+.alert {
+  padding: 0.7em 1em;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  margin-bottom: var(--space-4);
+}
+.alert-error { background: #fdecec; color: var(--danger); border: 1px solid #f5c9c9; }
+.alert-success { background: #e8f6ef; color: var(--success); border: 1px solid #bfe6d3; }
+
+/* ---------- tables ---------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.75em 1em;
+  border-bottom: 1px solid var(--border);
+}
+.table thead th {
+  background: var(--surface-2);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.table tbody tr:hover { background: var(--surface-2); }
+
+/* ---------- misc ---------- */
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+/* ---------- chips (multi-select / toggle) ---------- */
+.chip-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.4em 0.9em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.chip:hover { background: var(--surface-2); }
+.chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ---------- two-column form grid ---------- */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+@media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.form-hint { font-size: 0.8rem; margin: 0.3em 0 0; }
+
+/* ---------- auth pages (login / register shell) ---------- */
+.auth-wrap {
+  display: flex;
+  justify-content: center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+}
+.auth-title { margin-bottom: 0.15em; }
+.auth-sub { margin-bottom: var(--space-5); }
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+/* ---------- leaflet map pin (dynamically injected, must be global) ---------- */
+.map-pin {
+  background: transparent;
+  border: none;
+}
+.map-pin-inner {
+  font-size: 26px;
+  line-height: 1;
+  text-align: center;
+}

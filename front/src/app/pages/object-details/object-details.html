@@ -1,0 +1,266 @@
+<section class="page">
+  <div class="container">
+    @if (loading()) {
+      <p class="text-muted">Učitavanje…</p>
+    } @else if (obj() == null) {
+      <div class="card">
+        <h2>Objekat nije pronađen</h2>
+        <p class="text-muted">Traženi objekat ne postoji ili nije dostupan.</p>
+        <a routerLink="/search" class="btn btn-ghost">Nazad na pretragu</a>
+      </div>
+    } @else {
+      <div class="details-head">
+        <div>
+          <a routerLink="/search" class="back-link">← Pretraga</a>
+          <h1>{{ obj().name }}</h1>
+          <p class="text-muted">{{ obj().address }}, {{ obj().city }}</p>
+        </div>
+        <div class="likes-box">
+          <span class="like-pill like">👍 {{ ratings()?.likeCount ?? obj().likeCount }}</span>
+          <span class="like-pill dislike">👎 {{ ratings()?.dislikeCount ?? obj().dislikeCount }}</span>
+        </div>
+      </div>
+
+      <!-- gallery -->
+      <div class="gallery">
+        @if (obj().photos?.length) {
+          @for (p of obj().photos; track $index) {
+            <img class="gallery-img" [src]="p" alt="{{ obj().name }}" />
+          }
+        } @else {
+          <div class="gallery-empty">🏟️ Nema fotografija za ovaj objekat</div>
+        }
+      </div>
+
+      <div class="details-grid">
+        <!-- left column -->
+        <div class="details-main">
+          <!-- price list -->
+          <div class="card">
+            <h2>Cenovnik</h2>
+            <p class="price-line">
+              <span>Termin (po satu)</span>
+              <strong>{{ obj().pricePerHour }} RSD</strong>
+            </p>
+            <p class="text-muted work-hours">
+              Radno vreme: {{ obj().workingHours.open }}–{{ obj().workingHours.close }}
+            </p>
+
+            @if (equipment().length) {
+              <h3 class="sub">Oprema u prodaji</h3>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Naziv</th>
+                      <th>Sport</th>
+                      <th>Cena</th>
+                      <th>Na stanju</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of equipment(); track e._id) {
+                      <tr>
+                        <td>{{ e.name }}</td>
+                        <td>{{ e.sport?.name }}</td>
+                        <td>{{ e.price }} RSD</td>
+                        <td>{{ e.stock }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+
+          <!-- resource list -->
+          <div class="card">
+            <h2>Tereni i sale</h2>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Naziv</th>
+                    <th>Tip</th>
+                    <th>Kapacitet</th>
+                    <th>Sportovi</th>
+                    <th>Oprema</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (t of terrains(); track t._id) {
+                    <tr>
+                      <td>{{ t.name }}</td>
+                      <td><span class="chip type-chip">{{ typeLabel(t.type) }}</span></td>
+                      <td>{{ t.capacity }}</td>
+                      <td>
+                        <div class="sport-chips">
+                          @for (s of t.sports; track s._id) {
+                            <span class="chip sport-chip">{{ s.name }}</span>
+                          }
+                        </div>
+                      </td>
+                      <td class="eq-desc">{{ t.equipmentDescription || '—' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="text-muted">Nema unetih terena ni sala.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          @if (promotions().length) {
+            <div class="card">
+              <h2>Aktivne promocije</h2>
+              <div class="promo-list">
+                @for (p of promotions(); track p._id) {
+                  <div class="promo-row">
+                    <div>
+                      <strong>{{ p.name }}</strong>
+                      <span class="text-muted"> · {{ p.sport?.name }}</span>
+                    </div>
+                    <span class="badge">{{ discountLabel(p) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- right column: map -->
+        <div class="details-side">
+          <div class="card map-card">
+            <h2>Lokacija</h2>
+            <div #mapEl class="details-map"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ratings & comments -->
+      <div class="card ratings-card">
+        <div class="ratings-head">
+          <h2>Ocene i komentari</h2>
+          <div class="ratings-counts">
+            <span class="like-pill like">👍 {{ ratings()?.likeCount || 0 }}</span>
+            <span class="like-pill dislike">👎 {{ ratings()?.dislikeCount || 0 }}</span>
+          </div>
+        </div>
+
+        @if (auth.isLoggedIn() && auth.role() === 'sportista') {
+          @if (ratings()?.canRate) {
+            <div class="rating-form">
+              <div class="rating-toggle">
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="ratingLike() === true ? 'btn-primary' : 'btn-ghost'"
+                  (click)="setRatingLike(true)"
+                >
+                  👍 Sviđa mi se
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="ratingLike() === false ? 'btn-primary' : 'btn-ghost'"
+                  (click)="setRatingLike(false)"
+                >
+                  👎 Ne sviđa mi se
+                </button>
+              </div>
+              <textarea
+                [(ngModel)]="ratingComment"
+                maxlength="300"
+                rows="3"
+                placeholder="Komentar (opciono)…"
+              ></textarea>
+              @if (ratingError()) {
+                <p class="form-error">{{ ratingError() }}</p>
+              }
+              <button class="btn btn-primary btn-sm" (click)="submitRating()">Objavi ocenu</button>
+              <p class="rating-quota text-muted">
+                Preostalo ocena: {{ ratings().allowed - ratings().used }} / {{ ratings().allowed }}
+              </p>
+            </div>
+          } @else if (ratings()?.allowed === 0) {
+            <p class="text-muted rating-hint">
+              Ocenu možete ostaviti samo ako imate potvrđenu rezervaciju u ovom objektu.
+            </p>
+          } @else {
+            <p class="text-muted rating-hint">
+              Iskoristili ste sve dostupne ocene za ovaj objekat ({{ ratings()?.used }}/{{
+                ratings()?.allowed
+              }}).
+            </p>
+          }
+        }
+
+        <div class="comment-list">
+          @if (ratings()?.comments?.length) {
+            @for (c of ratings().comments; track c._id) {
+              <div class="comment" [class.own]="c.own">
+                <div class="comment-head">
+                  <span class="comment-author">
+                    {{ c.userName }}
+                    @if (c.own) {
+                      <span class="chip type-chip">Vi</span>
+                    }
+                  </span>
+                  <span class="comment-react">{{ c.like ? '👍' : '👎' }}</span>
+                </div>
+                <p class="comment-text">{{ c.comment }}</p>
+                <span class="comment-date text-muted">{{ c.createdAt | date: 'dd.MM.yyyy.' }}</span>
+              </div>
+            }
+          } @else {
+            <p class="text-muted">Još nema komentara za ovaj objekat.</p>
+          }
+        </div>
+      </div>
+
+      <!-- booking (sportista only) -->
+      @if (canBook() && terrains().length) {
+        <div class="card booking-card">
+          <h2>Rezerviši termin</h2>
+          <div class="court-rotate">
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              (click)="prevCourt()"
+              [disabled]="terrains().length < 2"
+            >
+              ‹
+            </button>
+            <div class="court-label">
+              <strong>{{ selectedTerrain()?.name }}</strong>
+              <span class="chip type-chip">{{ typeLabel(selectedTerrain()?.type) }}</span>
+              <span class="text-muted">({{ courtIndex() + 1 }}/{{ terrains().length }})</span>
+            </div>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              (click)="nextCourt()"
+              [disabled]="terrains().length < 2"
+            >
+              ›
+            </button>
+          </div>
+
+          <app-calendar
+            [resourceId]="selectedTerrain()?._id"
+            [workingHours]="obj().workingHours"
+            (reserved)="onReserved()"
+          />
+        </div>
+      } @else if (!canBook()) {
+        <div class="card booking-hint">
+          <p class="text-muted">
+            Prijavite se kao sportista da biste rezervisali termin na ovom objektu.
+          </p>
+        </div>
+      }
+    }
+  </div>
+</section>

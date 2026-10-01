@@ -1,0 +1,125 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Promocije</h1>
+        <p class="text-muted">Upravljaj promocijama za svoje objekte.</p>
+      </div>
+      @if (!showForm()) {
+        <button type="button" class="btn btn-primary" (click)="startCreate()">+ Nova promocija</button>
+      }
+    </div>
+
+    @if (showForm()) {
+      <form class="card" (ngSubmit)="submitForm()">
+        <h2>{{ editingId() ? 'Izmena promocije' : 'Nova promocija' }}</h2>
+        @if (formError()) {
+          <div class="alert alert-error">{{ formError() }}</div>
+        }
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Naziv</label>
+            <input [(ngModel)]="form.name" name="name" />
+          </div>
+          <div class="form-field">
+            <label>Objekat</label>
+            <select [(ngModel)]="form.objectId" name="objectId">
+              <option value="">— izaberi —</option>
+              @for (o of objects(); track o._id) {
+                <option [value]="o._id">{{ o.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Sport</label>
+            <select [(ngModel)]="form.sport" name="sport">
+              <option value="">— izaberi —</option>
+              @for (s of sports(); track s._id) {
+                <option [value]="s._id">{{ s.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Tip popusta</label>
+            <select [(ngModel)]="form.discountType" name="dtype">
+              <option value="percent">Procenat (%)</option>
+              <option value="fixed">Fiksni (RSD)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Vrednost</label>
+            <input type="number" [(ngModel)]="form.value" name="value" />
+          </div>
+          <div class="form-field"></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Važi od</label>
+            <input type="date" [(ngModel)]="form.validFrom" name="from" />
+          </div>
+          <div class="form-field">
+            <label>Važi do</label>
+            <input type="date" [(ngModel)]="form.validTo" name="to" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">{{ editingId() ? 'Sačuvaj' : 'Kreiraj' }}</button>
+          <button type="button" class="btn btn-ghost" (click)="cancelForm()">Otkaži</button>
+        </div>
+      </form>
+    }
+
+    <div class="filter-bar">
+      <select [(ngModel)]="filterObject" (change)="reload()">
+        <option value="">Svi objekti</option>
+        @for (o of objects(); track o._id) {
+          <option [value]="o._id">{{ o.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (listMsg()) {
+      <div class="alert alert-success">{{ listMsg() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="card"><p class="text-muted">Učitavanje…</p></div>
+    } @else if (promotions().length === 0) {
+      <div class="card"><p class="text-muted">Nema promocija.</p></div>
+    } @else {
+      <div class="table-wrap card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Naziv</th>
+              <th>Objekat</th>
+              <th>Sport</th>
+              <th>Popust</th>
+              <th>Period</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of promotions(); track p._id) {
+              <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.objectId?.name }}</td>
+                <td>{{ p.sport?.name }}</td>
+                <td>{{ discountLabel(p) }}</td>
+                <td>{{ p.validFrom | date: 'dd.MM.yyyy' }} – {{ p.validTo | date: 'dd.MM.yyyy' }}</td>
+                <td class="row-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="startEdit(p)">Izmeni</button>
+                  <button type="button" class="btn btn-danger btn-sm" (click)="remove(p)">Obriši</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  font-family: var(--font);
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.grid.base {
+  stroke: var(--text-muted);
+  stroke-opacity: 0.4;
+}
+
+.axis {
+  fill: var(--text-muted);
+  font-size: 11px;
+}
+
+.bar {
+  transition: opacity 0.15s ease;
+}
+
+.bar:hover {
+  opacity: 0.85;
+}
+
+.value {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.label {
+  fill: var(--text-muted);
+  font-size: 12px;
+}

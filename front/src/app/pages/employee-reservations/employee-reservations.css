@@ -1,0 +1,80 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.filter-bar select {
+  width: auto;
+  min-width: 200px;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6em 1em;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--color-primary-dark);
+  border-bottom-color: var(--color-primary);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  padding: 0;
+}
+
+.row-actions {
+  display: flex;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.badge-pending {
+  background: #fff2d9;
+  color: var(--color-accent-dark);
+}
+
+.badge-confirmed,
+.badge-held {
+  background: #e8f6ef;
+  color: var(--success);
+}
+
+.badge-noshow {
+  background: #fdecec;
+  color: var(--danger);
+}
+
+.badge-cancelled {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.badge-scheduled {
+  background: #fff2d9;
+  color: var(--color-accent-dark);
+}

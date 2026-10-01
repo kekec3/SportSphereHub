@@ -1,0 +1,121 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Rezervacije i treninzi</h1>
+        <p class="text-muted">
+          Potvrdi dolazak ili označi nedolazak u roku od 10 minuta od početka termina.
+        </p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab" [class.active]="tab() === 'reservations'" (click)="setTab('reservations')">
+        Rezervacije
+      </button>
+      <button type="button" class="tab" [class.active]="tab() === 'trainings'" (click)="setTab('trainings')">
+        Treninzi
+      </button>
+    </div>
+
+    <div class="filter-bar">
+      <select [(ngModel)]="filterObject" (change)="reload()">
+        <option value="">Svi objekti</option>
+        @for (o of objects(); track o._id) {
+          <option [value]="o._id">{{ o.name }}</option>
+        }
+      </select>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="reload()">Osveži</button>
+    </div>
+
+    @if (actionMsg()) {
+      <div class="alert alert-success">{{ actionMsg() }}</div>
+    }
+    @if (actionError()) {
+      <div class="alert alert-error">{{ actionError() }}</div>
+    }
+
+    @if (tab() === 'reservations') {
+      @if (loading()) {
+        <div class="card"><p class="text-muted">Učitavanje…</p></div>
+      } @else if (reservations().length === 0) {
+        <div class="card"><p class="text-muted">Nema rezervacija.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Termin</th>
+                <th>Objekat</th>
+                <th>Teren</th>
+                <th>Korisnik</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of reservations(); track r._id) {
+                <tr>
+                  <td>{{ r.date | date: 'dd.MM.yyyy' }}</td>
+                  <td>{{ r.startTime }}–{{ r.endTime }}</td>
+                  <td>{{ r.objectName }}</td>
+                  <td>{{ r.resourceName }}</td>
+                  <td>{{ r.userName }}</td>
+                  <td><span class="badge" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span></td>
+                  <td class="row-actions">
+                    @if (r.actionable) {
+                      <button type="button" class="btn btn-primary btn-sm" (click)="confirm(r)">Potvrdi</button>
+                      <button type="button" class="btn btn-danger btn-sm" (click)="noShow(r)">Nedolazak</button>
+                    } @else if (r.status === 'pending') {
+                      <span class="text-muted small">van termina</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'trainings') {
+      @if (loading()) {
+        <div class="card"><p class="text-muted">Učitavanje…</p></div>
+      } @else if (trainings().length === 0) {
+        <div class="card"><p class="text-muted">Nema treninga.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Termin</th>
+                <th>Objekat</th>
+                <th>Trener</th>
+                <th>Sport</th>
+                <th>Sportista</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of trainings(); track t._id) {
+                <tr>
+                  <td>{{ t.date | date: 'dd.MM.yyyy' }}</td>
+                  <td>{{ t.startTime }}–{{ t.endTime }}</td>
+                  <td>{{ t.objectName }}</td>
+                  <td>{{ t.coachName }}</td>
+                  <td>{{ t.sportName }}</td>
+                  <td>{{ t.userName }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="trainingStatusClass(t.status)">{{ trainingStatusLabel(t.status) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</section>

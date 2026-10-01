@@ -1,0 +1,21 @@
+<div class="avatar-gen">
+  <div class="avatar-gen-preview">
+    <img [src]="previewUrl()" alt="avatar" />
+  </div>
+
+  <div class="avatar-gen-controls">
+    <div class="avatar-styles">
+      @for (s of styles; track s) {
+        <button type="button" class="chip" [class.active]="style() === s" (click)="setStyle(s)">
+          {{ s }}
+        </button>
+      }
+    </div>
+    <div class="avatar-actions">
+      <button type="button" class="btn btn-ghost btn-sm" (click)="randomize()">Nasumično</button>
+      <button type="button" class="btn btn-primary btn-sm" (click)="save()" [disabled]="saving()">
+        {{ saving() ? 'Čuvanje…' : 'Koristi ovaj avatar' }}
+      </button>
+    </div>
+  </div>
+</div>

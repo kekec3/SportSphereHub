@@ -1,0 +1,77 @@
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.tab {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6em 1em;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--color-primary-dark);
+  border-bottom-color: var(--color-primary);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  padding: 0;
+}
+
+.table select {
+  width: auto;
+  min-width: 120px;
+  padding: 0.35em 0.5em;
+}
+
+.row-actions {
+  display: flex;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.add-form {
+  margin-bottom: var(--space-5);
+}
+
+.add-form h3 {
+  margin: 0 0 var(--space-4);
+  font-size: 1.05rem;
+}
+
+.add-form .btn {
+  margin-top: var(--space-2);
+}
+
+.sport-add {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.sport-add input {
+  max-width: 280px;
+}
+
+.badge-on {
+  background: #e8f6ef;
+  color: var(--success);
+}
+
+.badge-off {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}

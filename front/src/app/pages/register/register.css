@@ -1,0 +1,47 @@
+.register-card {
+  max-width: 640px;
+}
+
+.role-toggle {
+  display: flex;
+  gap: var(--space-3);
+}
+.role-toggle label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
+.role-toggle label.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+.role-toggle input {
+  width: auto;
+}
+
+.employee-box {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--surface-2);
+}
+
+.avatar-mode {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.avatar-ok {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--success);
+}

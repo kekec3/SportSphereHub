@@ -1,0 +1,60 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Izveštaji</h1>
+        <p class="text-muted">Preuzmi mesečne PDF izveštaje za svoje objekte.</p>
+      </div>
+    </div>
+
+    <div class="card report-form">
+      @if (error()) {
+        <div class="alert alert-error">{{ error() }}</div>
+      }
+
+      <div class="grid-2">
+        <div class="form-field">
+          <label>Objekat</label>
+          <select [(ngModel)]="selectedObjectId">
+            <option value="">— izaberi objekat —</option>
+            @for (object of objects(); track object._id) {
+              <option [value]="object._id">{{ object.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Mesec</label>
+          <input type="month" [(ngModel)]="month" />
+        </div>
+      </div>
+
+      <div class="report-cards">
+        <div class="report-card">
+          <h3>Popunjenost terena</h3>
+          <p class="text-muted">Procenat iskorišćenosti svakog terena u izabranom mesecu.</p>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!canDownload() || loadingOccupancy()"
+            (click)="downloadOccupancy()"
+          >
+            {{ loadingOccupancy() ? 'Generisanje…' : 'Preuzmi PDF' }}
+          </button>
+        </div>
+
+        <div class="report-card">
+          <h3>Obrt opreme</h3>
+          <p class="text-muted">Prodate količine i prihod po artiklu opreme.</p>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!canDownload() || loadingTurnover()"
+            (click)="downloadTurnover()"
+          >
+            {{ loadingTurnover() ? 'Generisanje…' : 'Preuzmi PDF' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

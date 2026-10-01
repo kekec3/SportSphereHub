@@ -1,0 +1,41 @@
+.report-form .grid-2 {
+  margin-bottom: var(--space-5);
+}
+
+.report-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .report-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.report-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--surface-2);
+}
+
+.report-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.report-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.report-card .btn {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+}

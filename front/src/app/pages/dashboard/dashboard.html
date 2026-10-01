@@ -1,0 +1,21 @@
+<section class="page">
+  <div class="container">
+    <div class="card">
+      <span class="badge">{{ auth.role() }}</span>
+      <h1>Zdravo, {{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}</h1>
+      <p class="text-muted">
+        Ovo je zaštićena stranica za ulogu <strong>{{ auth.role() }}</strong
+        >. Funkcionalnosti stižu u narednim fazama.
+      </p>
+    </div>
+
+    <div class="demo-block">
+      <h2>Demo tabele</h2>
+      <p class="text-muted">
+        Klik na zaglavlje kolone menja sortiranje. Ova komponenta se ponovo koristi u kasnijim
+        fazama (pretraga, rezervacije…).
+      </p>
+      <app-sortable-table [columns]="demoColumns" [rows]="demoRows" />
+    </div>
+  </div>
+</section>

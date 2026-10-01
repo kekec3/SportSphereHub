@@ -1,0 +1,116 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Kalendar rezervacija</h1>
+        <p class="text-muted">
+          Prevuci rezervaciju u slobodan termin da je pomeriš. Prevlačenje je dozvoljeno samo na
+          zatvorenim terenima i halama.
+        </p>
+      </div>
+    </div>
+
+    <div class="pickers card">
+      <div class="form-field">
+        <label>Objekat</label>
+        <select [(ngModel)]="selectedObjectId" (change)="onObjectChange()">
+          <option value="">— izaberi objekat —</option>
+          @for (object of objects(); track object._id) {
+            <option [value]="object._id">{{ object.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Teren</label>
+        <select
+          [(ngModel)]="selectedResourceId"
+          (change)="onResourceChange()"
+          [disabled]="!terrains().length"
+        >
+          <option value="">— izaberi teren —</option>
+          @for (terrain of terrains(); track terrain._id) {
+            <option [value]="terrain._id">{{ terrain.name }} ({{ typeLabel(terrain.type) }})</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (selectedResourceId) {
+      @if (!canMove()) {
+        <div class="alert alert-info">Otvoreni teren — prevlačenje nije dozvoljeno (samo pregled).</div>
+      }
+      @if (error()) {
+        <div class="alert alert-error">{{ error() }}</div>
+      }
+      @if (message()) {
+        <div class="alert alert-success">{{ message() }}</div>
+      }
+
+      <div class="calendar card">
+        <div class="cal-toolbar">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="prevWeek()">‹ Prethodna</button>
+          <span class="cal-week">{{ weekLabel() }}</span>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="nextWeek()">Sledeća ›</button>
+        </div>
+
+        <div class="cal-scroll" cdkDropListGroup>
+          <table class="cal-table">
+            <thead>
+              <tr>
+                <th class="cal-hour-col">Sat</th>
+                @for (day of days(); track day.getTime()) {
+                  <th>
+                    <div class="cal-day">{{ dayLabel(day) }}</div>
+                    <div class="cal-date">{{ day.getDate() }}.{{ day.getMonth() + 1 }}.</div>
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (hour of hours(); track hour) {
+                <tr>
+                  <td class="cal-hour-col">{{ hour }}:00</td>
+                  @for (day of days(); track day.getTime()) {
+                    <td
+                      class="cal-cell"
+                      [class.booked]="isBooked(day, hour)"
+                      [class.past]="isPast(day, hour)"
+                      cdkDropList
+                      [cdkDropListData]="{ day: day, hour: hour }"
+                      (cdkDropListDropped)="onDrop($event, day, hour)"
+                    >
+                      @if (cardAt(day, hour); as reservation) {
+                        <div
+                          class="cal-card"
+                          [class.confirmed]="reservation.status === 'confirmed'"
+                          [class.readonly]="!canMove()"
+                          cdkDrag
+                          [cdkDragData]="reservation"
+                          [cdkDragDisabled]="!canMove()"
+                        >
+                          <span class="cal-card-time">{{ cardLabel(reservation) }}</span>
+                          <span class="cal-card-user">{{ reservation.userName }}</span>
+                        </div>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cal-legend">
+          <span><i class="dot free"></i> Slobodno</span>
+          <span><i class="dot booked"></i> Zauzeto</span>
+          <span><i class="dot past"></i> Prošlo</span>
+          <span><i class="dot confirmed"></i> Potvrđeno</span>
+        </div>
+      </div>
+    } @else {
+      <div class="card">
+        <p class="text-muted">Izaberi objekat i teren da bi prikazao nedeljni kalendar.</p>
+      </div>
+    }
+  </div>
+</section>

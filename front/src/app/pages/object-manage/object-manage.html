@@ -1,0 +1,205 @@
+<section class="page">
+  <div class="container">
+    @if (loading()) {
+      <div class="card"><p class="text-muted">Učitavanje…</p></div>
+    } @else if (notFound()) {
+      <div class="card">
+        <p class="text-muted">Objekat nije pronađen ili nemaš pristup.</p>
+        <a routerLink="/zaposleni" class="btn btn-ghost btn-sm">Nazad na moje objekte</a>
+      </div>
+    } @else {
+      <div class="details-head">
+        <div>
+          <h1>{{ object()?.name }}</h1>
+          <span
+            class="badge"
+            [class.badge-approved]="object()?.status === 'approved'"
+            [class.badge-pending]="object()?.status === 'pending'"
+            >{{ object()?.status === 'approved' ? 'Odobren' : 'Na čekanju' }}</span
+          >
+        </div>
+        <a routerLink="/zaposleni" class="btn btn-ghost btn-sm">← Svi objekti</a>
+      </div>
+
+      <form class="card" (ngSubmit)="saveObject()">
+        <h2>Podaci o objektu</h2>
+        @if (objError()) {
+          <div class="alert alert-error">{{ objError() }}</div>
+        }
+        @if (objSuccess()) {
+          <div class="alert alert-success">{{ objSuccess() }}</div>
+        }
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Naziv</label>
+            <input [(ngModel)]="form.name" name="name" />
+          </div>
+          <div class="form-field">
+            <label>Grad</label>
+            <input [(ngModel)]="form.city" name="city" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Adresa</label>
+          <input [(ngModel)]="form.address" name="address" />
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Geo. širina (lat)</label>
+            <input type="number" step="any" [(ngModel)]="form.lat" name="lat" />
+          </div>
+          <div class="form-field">
+            <label>Geo. dužina (lng)</label>
+            <input type="number" step="any" [(ngModel)]="form.lng" name="lng" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Cena po satu (RSD)</label>
+            <input type="number" [(ngModel)]="form.pricePerHour" name="price" />
+          </div>
+          <div class="form-field">
+            <label>Maks. nedolazaka</label>
+            <input type="number" [(ngModel)]="form.maxNoShows" name="mns" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Otvaranje</label>
+            <input type="time" [(ngModel)]="form.open" name="open" />
+          </div>
+          <div class="form-field">
+            <label>Zatvaranje</label>
+            <input type="time" [(ngModel)]="form.close" name="close" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>
+        </div>
+      </form>
+
+      <div class="card">
+        <h2>Tereni ({{ terrains().length }})</h2>
+        <p class="form-hint">Objekat mora imati bar jedan otvoren teren kapaciteta ≥ 4.</p>
+        @if (editError()) {
+          <div class="alert alert-error">{{ editError() }}</div>
+        }
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Naziv</th>
+                <th>Tip</th>
+                <th>Kap.</th>
+                <th>Sportovi</th>
+                <th>Oprema</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of terrains(); track t._id) {
+                @if (editingId() === t._id) {
+                  <tr class="edit-row">
+                    <td><input [(ngModel)]="edit.name" name="ename" /></td>
+                    <td>
+                      <select [(ngModel)]="edit.type" name="etype">
+                        <option value="open">Otvoren</option>
+                        <option value="closed">Zatvoren</option>
+                        <option value="hall">Hala</option>
+                      </select>
+                    </td>
+                    <td><input type="number" [(ngModel)]="edit.capacity" name="ecap" class="cap-input" /></td>
+                    <td>
+                      <div class="chip-list">
+                        @for (s of sports(); track s._id) {
+                          <button
+                            type="button"
+                            class="chip chip-xs"
+                            [class.active]="editSports().includes(s._id)"
+                            (click)="toggleEditSport(s._id)"
+                          >
+                            {{ s.name }}
+                          </button>
+                        }
+                      </div>
+                    </td>
+                    <td><input [(ngModel)]="edit.equipmentDescription" name="edesc" maxlength="300" /></td>
+                    <td class="row-actions">
+                      <button type="button" class="btn btn-primary btn-sm" (click)="saveEdit()">Sačuvaj</button>
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">Otkaži</button>
+                    </td>
+                  </tr>
+                } @else {
+                  <tr>
+                    <td>{{ t.name }}</td>
+                    <td>{{ typeLabel(t.type) }}</td>
+                    <td>{{ t.capacity }}</td>
+                    <td>{{ terrainSports(t) }}</td>
+                    <td class="desc-cell">{{ t.equipmentDescription || '—' }}</td>
+                    <td class="row-actions">
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="startEdit(t)">Izmeni</button>
+                      <button type="button" class="btn btn-danger btn-sm" (click)="removeResource(t)">Obriši</button>
+                    </td>
+                  </tr>
+                }
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-muted">Objekat još nema unetih terena ni sala.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="res-builder">
+          <h3>Dodaj teren</h3>
+          @if (addError()) {
+            <div class="alert alert-error">{{ addError() }}</div>
+          }
+          @if (addSuccess()) {
+            <div class="alert alert-success">{{ addSuccess() }}</div>
+          }
+          <div class="grid-2">
+            <div class="form-field">
+              <label>Naziv</label>
+              <input [(ngModel)]="draft.name" name="dname" />
+            </div>
+            <div class="form-field">
+              <label>Tip</label>
+              <select [(ngModel)]="draft.type" name="dtype">
+                <option value="open">Otvoren</option>
+                <option value="closed">Zatvoren</option>
+                <option value="hall">Hala</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Kapacitet</label>
+            <input type="number" [(ngModel)]="draft.capacity" name="dcap" />
+          </div>
+          <div class="form-field">
+            <label>Sportovi</label>
+            <div class="chip-list">
+              @for (s of sports(); track s._id) {
+                <button
+                  type="button"
+                  class="chip"
+                  [class.active]="draftSports().includes(s._id)"
+                  (click)="toggleDraftSport(s._id)"
+                >
+                  {{ s.name }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Opis opreme (opciono, ≤300)</label>
+            <textarea [(ngModel)]="draft.equipmentDescription" name="ddesc" maxlength="300" rows="2"></textarea>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" (click)="addResource()">+ Dodaj teren</button>
+        </div>
+      </div>
+    }
+  </div>
+</section>

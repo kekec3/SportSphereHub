@@ -1,0 +1,17 @@
+<div class="file-upload">
+  <label class="file-label">
+    <input type="file" [accept]="accept()" (change)="onFile($event)" hidden />
+    <span class="btn btn-ghost btn-sm">{{ label() }}</span>
+  </label>
+
+  @if (fileName()) {
+    <span class="file-name">{{ fileName() }}</span>
+  }
+
+  @if (showImage()) {
+    <div class="file-preview">
+      <img [src]="dataUrl()" alt="pregled" />
+      <button type="button" class="btn btn-ghost btn-sm" (click)="clear()">Ukloni</button>
+    </div>
+  }
+</div>

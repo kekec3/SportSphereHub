@@ -1,0 +1,38 @@
+<div class="table-scroll">
+  <table class="table sortable-table">
+    <thead>
+      <tr>
+        @for (col of columns(); track col.key) {
+          <th class="sortable-th" (click)="sortBy(col.key)">
+            {{ col.label }}
+            <span class="sort-ind">{{ indicator(col.key) }}</span>
+          </th>
+        }
+        @if (actionLabel()) {
+          <th>Akcija</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sortedRows(); track $index) {
+        <tr [class.clickable-row]="clickable()" (click)="onRowClick(row)">
+          @for (col of columns(); track col.key) {
+            <td>{{ row[col.key] }}</td>
+          }
+          @if (actionLabel()) {
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="onAction($event, row)">
+                {{ actionLabel() }}
+              </button>
+            </td>
+          }
+        </tr>
+      }
+      @if (sortedRows().length === 0) {
+        <tr>
+          <td class="empty-cell" [attr.colspan]="columns().length + (actionLabel() ? 1 : 0)">Nema podataka.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

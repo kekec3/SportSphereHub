@@ -1,0 +1,123 @@
+.calendar {
+  width: 100%;
+}
+
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.cal-week {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cal-scroll {
+  overflow-x: auto;
+}
+
+.cal-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+  user-select: none;
+}
+.cal-table th,
+.cal-table td {
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.cal-table thead th {
+  padding: 0.5em 0.4em;
+  background: var(--surface-2);
+  font-size: 0.8rem;
+}
+.cal-day {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.cal-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cal-hour-col {
+  width: 56px;
+  background: var(--surface-2);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 0.5em;
+}
+
+.cal-cell {
+  height: 34px;
+  cursor: pointer;
+  background: #eafaf1;
+  transition: background 0.1s ease;
+}
+.cal-cell:hover {
+  background: #c9f0da;
+}
+.cal-cell.booked {
+  background: #fbdcdc;
+  cursor: not-allowed;
+}
+.cal-cell.past {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--surface-2),
+    var(--surface-2) 5px,
+    #f0e6da 5px,
+    #f0e6da 10px
+  );
+  cursor: not-allowed;
+}
+.cal-cell.selected {
+  background: #bcd9ff;
+  box-shadow: inset 0 0 0 2px #3d7bd6;
+}
+
+.cal-legend {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.cal-legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 0.4em;
+  vertical-align: -1px;
+  border: 1px solid var(--border);
+}
+.dot.free {
+  background: #eafaf1;
+}
+.dot.booked {
+  background: #fbdcdc;
+}
+.dot.selected {
+  background: #bcd9ff;
+}
+
+.cal-reserve {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}

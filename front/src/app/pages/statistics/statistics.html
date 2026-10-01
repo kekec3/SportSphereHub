@@ -1,0 +1,55 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Statistika</h1>
+        <p class="text-muted">Pregled tvoje aktivnosti i potrošnje na opremu.</p>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="card"><p class="text-muted">Učitavanje statistike…</p></div>
+    } @else if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    } @else {
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-value">{{ perSport().length }}</span>
+          <span class="stat-label">Sportova sa aktivnošću</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ topSport() }}</span>
+          <span class="stat-label">Najčešći sport</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ mySpend() }} RSD</span>
+          <span class="stat-label">Moja potrošnja na opremu</span>
+        </div>
+        <div class="stat-card accent">
+          <span class="stat-value">{{ globalSpend() }} RSD</span>
+          <span class="stat-label">Ukupna potrošnja (svi sportisti)</span>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <h2>Rezervacije po sportu</h2>
+          @if (perSport().length) {
+            <app-bar-chart [data]="perSport()" />
+          } @else {
+            <p class="text-muted empty">Još nemaš rezervacija.</p>
+          }
+        </div>
+
+        <div class="card chart-card">
+          <h2>Mesečna aktivnost</h2>
+          @if (perMonth().length) {
+            <app-line-chart [data]="perMonth()" color="var(--color-accent)" />
+          } @else {
+            <p class="text-muted empty">Još nemaš rezervacija.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

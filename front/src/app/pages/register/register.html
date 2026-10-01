@@ -1,0 +1,147 @@
+<section class="auth-wrap page">
+  <div class="auth-card card register-card">
+    <h1 class="auth-title">Registracija</h1>
+    <p class="text-muted auth-sub">Napravite nalog kao sportista ili zaposleni.</p>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="alert alert-success">{{ success() }}</div>
+    }
+
+    <form (ngSubmit)="submit()">
+      <!-- role -->
+      <div class="form-field">
+        <label>Uloga</label>
+        <div class="role-toggle">
+          <label [class.active]="role === 'sportista'">
+            <input type="radio" name="role" value="sportista" [(ngModel)]="role" /> Sportista
+          </label>
+          <label [class.active]="role === 'zaposleni'">
+            <input type="radio" name="role" value="zaposleni" [(ngModel)]="role" /> Zaposleni
+          </label>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-field">
+          <label for="firstName">Ime</label>
+          <input id="firstName" name="firstName" type="text" [(ngModel)]="firstName" />
+        </div>
+        <div class="form-field">
+          <label for="lastName">Prezime</label>
+          <input id="lastName" name="lastName" type="text" [(ngModel)]="lastName" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-field">
+          <label for="username">Korisničko ime</label>
+          <input id="username" name="username" type="text" [(ngModel)]="username" />
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" [(ngModel)]="email" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-field">
+          <label for="phone">Telefon</label>
+          <input id="phone" name="phone" type="tel" [(ngModel)]="phone" />
+        </div>
+        <div class="form-field">
+          <label for="password">Lozinka</label>
+          <input id="password" name="password" type="password" [(ngModel)]="password" />
+          <p class="form-hint">
+            8–12 znakova, počinje slovom, sadrži veliko slovo, cifru i specijalni znak.
+          </p>
+        </div>
+      </div>
+
+      <!-- favorite sports -->
+      <div class="form-field">
+        <label>Omiljeni sportovi <span class="text-muted">(do 5)</span></label>
+        <div class="chip-list">
+          @for (s of sports(); track s._id) {
+            <button
+              type="button"
+              class="chip"
+              [class.active]="isSelected(s._id)"
+              (click)="toggleSport(s._id)"
+            >
+              {{ s.name }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- employee-only fields -->
+      @if (role === 'zaposleni') {
+        <div class="employee-box">
+          <div class="form-field">
+            <label for="objectId">Objekat u kojem radite</label>
+            <select id="objectId" name="objectId" [(ngModel)]="objectId">
+              <option value="">— izaberite objekat —</option>
+              @for (o of objects(); track o._id) {
+                <option [value]="o._id">{{ o.name }} — {{ o.city }}</option>
+              }
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="form-field">
+              <label for="maticniBroj">Matični broj</label>
+              <input id="maticniBroj" name="maticniBroj" type="text" [(ngModel)]="maticniBroj" />
+            </div>
+            <div class="form-field">
+              <label for="pib">PIB</label>
+              <input id="pib" name="pib" type="text" [(ngModel)]="pib" />
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- avatar -->
+      <div class="form-field">
+        <label>Avatar</label>
+        <div class="avatar-mode">
+          <button
+            type="button"
+            class="chip"
+            [class.active]="avatarMode() === 'generate'"
+            (click)="avatarMode.set('generate')"
+          >
+            Generiši
+          </button>
+          <button
+            type="button"
+            class="chip"
+            [class.active]="avatarMode() === 'upload'"
+            (click)="avatarMode.set('upload')"
+          >
+            Otpremi sliku
+          </button>
+        </div>
+
+        @if (avatarMode() === 'generate') {
+          <app-avatar-generator (avatarSelected)="onAvatar($event)" />
+        } @else {
+          <app-file-upload label="Izaberi sliku" (fileSelected)="onAvatar($event)" />
+        }
+
+        @if (avatar()) {
+          <p class="avatar-ok">✓ Avatar je izabran.</p>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading()">
+        {{ loading() ? 'Slanje…' : 'Registruj se' }}
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <span>Već imate nalog? <a routerLink="/login">Prijavite se</a></span>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,250 @@
+<section class="page">
+  <div class="container">
+    <div class="details-head">
+      <div>
+        <h1>Administracija</h1>
+        <p class="text-muted">Korisnici, zahtevi, objekti, treneri i sportovi.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab" [class.active]="tab() === 'users'" (click)="setTab('users')">Korisnici</button>
+      <button type="button" class="tab" [class.active]="tab() === 'requests'" (click)="setTab('requests')">Zahtevi</button>
+      <button type="button" class="tab" [class.active]="tab() === 'objects'" (click)="setTab('objects')">Objekti</button>
+      <button type="button" class="tab" [class.active]="tab() === 'coaches'" (click)="setTab('coaches')">Treneri</button>
+      <button type="button" class="tab" [class.active]="tab() === 'sports'" (click)="setTab('sports')">Sportovi</button>
+    </div>
+
+    @if (message()) {
+      <div class="alert alert-success">{{ message() }}</div>
+    }
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    @if (tab() === 'users') {
+      @if (users().length === 0) {
+        <div class="card"><p class="text-muted">Nema korisnika.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Korisnik</th>
+                <th>Ime</th>
+                <th>Email</th>
+                <th>Uloga</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user._id) {
+                <tr>
+                  <td>
+                    {{ user.username }}
+                    @if (isSelf(user)) {
+                      <span class="badge">Vi</span>
+                    }
+                  </td>
+                  <td>{{ user.firstName }} {{ user.lastName }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <select [(ngModel)]="user.role" (change)="saveUser(user)" [disabled]="isSelf(user)">
+                      @for (role of roles; track role) {
+                        <option [value]="role">{{ roleLabel(role) }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    <select [(ngModel)]="user.status" (change)="saveUser(user)" [disabled]="isSelf(user)">
+                      @for (status of statuses; track status) {
+                        <option [value]="status">{{ statusLabel(status) }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    @if (!isSelf(user)) {
+                      <button type="button" class="btn btn-danger btn-sm" (click)="deleteUser(user)">Obriši</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'requests') {
+      @if (requests().length === 0) {
+        <div class="card"><p class="text-muted">Nema zahteva na čekanju.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Korisnik</th>
+                <th>Ime</th>
+                <th>Uloga</th>
+                <th>Objekat</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (request of requests(); track request._id) {
+                <tr>
+                  <td>{{ request.username }}</td>
+                  <td>{{ request.firstName }} {{ request.lastName }}</td>
+                  <td>{{ roleLabel(request.role) }}</td>
+                  <td>{{ request.objectId?.name || '—' }}</td>
+                  <td class="row-actions">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="approveRequest(request)">Odobri</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="rejectRequest(request)">Odbij</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'objects') {
+      @if (pendingObjects().length === 0) {
+        <div class="card"><p class="text-muted">Nema objekata na čekanju.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Naziv</th>
+                <th>Grad</th>
+                <th>Vlasnici</th>
+                <th>Tereni</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (object of pendingObjects(); track object._id) {
+                <tr>
+                  <td>{{ object.name }}</td>
+                  <td>{{ object.city }}</td>
+                  <td>{{ object.owners.join(', ') }}</td>
+                  <td>{{ object.terrainCount }}</td>
+                  <td class="row-actions">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="approveObject(object)">Odobri</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="rejectObject(object)">Odbij</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'coaches') {
+      <div class="card add-form">
+        <h3>Dodaj trenera</h3>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Ime</label>
+            <input [(ngModel)]="newCoach.name" name="cname" />
+          </div>
+          <div class="form-field">
+            <label>Specijalnost</label>
+            <input [(ngModel)]="newCoach.specialization" name="cspec" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-field">
+            <label>Objekat</label>
+            <select [(ngModel)]="newCoach.objectId" name="cobj">
+              <option value="">— izaberi —</option>
+              @for (object of approvedObjects(); track object._id) {
+                <option [value]="object._id">{{ object.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Sport</label>
+            <select [(ngModel)]="newCoach.sport" name="csport">
+              <option value="">— izaberi —</option>
+              @for (sport of sports(); track sport._id) {
+                <option [value]="sport._id">{{ sport.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Cena po satu (RSD)</label>
+          <input type="number" [(ngModel)]="newCoach.pricePerHour" name="cprice" />
+        </div>
+        <button type="button" class="btn btn-primary" (click)="addCoach()">Dodaj trenera</button>
+      </div>
+
+      @if (coaches().length === 0) {
+        <div class="card"><p class="text-muted">Nema trenera.</p></div>
+      } @else {
+        <div class="table-wrap card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Ime</th>
+                <th>Objekat</th>
+                <th>Sport</th>
+                <th>Specijalnost</th>
+                <th>Cena</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (coach of coaches(); track coach._id) {
+                <tr>
+                  <td>{{ coach.name }}</td>
+                  <td>{{ coach.objectId?.name || '—' }}</td>
+                  <td>{{ coach.sport?.name || '—' }}</td>
+                  <td>{{ coach.specialization }}</td>
+                  <td>{{ coach.pricePerHour }} RSD</td>
+                  <td>
+                    <span class="badge" [class.badge-on]="coach.active" [class.badge-off]="!coach.active">
+                      {{ coach.active ? 'Aktivan' : 'Neaktivan' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="toggleCoach(coach)">
+                      {{ coach.active ? 'Deaktiviraj' : 'Aktiviraj' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    @if (tab() === 'sports') {
+      <div class="card add-form">
+        <h3>Dodaj sport</h3>
+        <div class="sport-add">
+          <input [(ngModel)]="newSport" name="sname" placeholder="Naziv sporta" />
+          <button type="button" class="btn btn-primary" (click)="addSport()">Dodaj</button>
+        </div>
+      </div>
+      @if (sports().length === 0) {
+        <div class="card"><p class="text-muted">Nema sportova.</p></div>
+      } @else {
+        <div class="card">
+          <div class="chip-list">
+            @for (sport of sports(); track sport._id) {
+              <span class="chip">{{ sport.name }}</span>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</section>

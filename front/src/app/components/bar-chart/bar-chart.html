@@ -1,0 +1,33 @@
+<svg
+  class="chart"
+  [attr.viewBox]="'0 0 ' + width + ' ' + height"
+  preserveAspectRatio="xMidYMid meet"
+  role="img"
+>
+  @for (g of gridLines(); track g.y) {
+    <line class="grid" [attr.x1]="padL" [attr.y1]="g.y" [attr.x2]="g.x2" [attr.y2]="g.y" />
+    <text class="axis" [attr.x]="padL - 8" [attr.y]="g.y + 4" text-anchor="end">{{ g.value }}</text>
+  }
+
+  <line
+    class="grid base"
+    [attr.x1]="padL"
+    [attr.y1]="baseY"
+    [attr.x2]="width - padR"
+    [attr.y2]="baseY"
+  />
+
+  @for (b of bars(); track b.label) {
+    <rect
+      class="bar"
+      [attr.x]="b.x"
+      [attr.y]="b.y"
+      [attr.width]="b.w"
+      [attr.height]="b.h"
+      rx="6"
+      [attr.fill]="color()"
+    />
+    <text class="value" [attr.x]="b.cx" [attr.y]="b.valueY" text-anchor="middle">{{ b.value }}</text>
+    <text class="label" [attr.x]="b.cx" [attr.y]="b.labelY" text-anchor="middle">{{ b.label }}</text>
+  }
+</svg>
